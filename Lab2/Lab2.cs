@@ -20,22 +20,35 @@ namespace ArhitectureLab2
         {
             User Igor = new User("Igor", "123", "lol@gmail.com");
             User Sashka = new User("Sashka", "LovePivo", "sashkaprogramist@gmail.com");
+            //User[] usersArr = new User[2] {Igor, Sashka};
+            List<User> usersArr = new List<User> { Igor, Sashka };
 
-            Meeting meetWithSashka = new Meeting(new DateTime(2022, 10, 17), "в курілці", "LovePHP", Igor, new DateTime(2022, 10, 17, 10, 20, 0), new DateTime(2022, 10, 17, 14, 20, 0));
-            BithdayDate bithdayInSashka = new BithdayDate(new DateTime(2023, 6, 21), "днюха у сашки купити кільце з хелоу кіті", "Bithday", Igor, new DateTime(2023, 6, 25), Sashka);
 
-            Action[] actions = new Action[2] { meetWithSashka, bithdayInSashka };
+            Meeting meetWithSashka = new Meeting(new DateTime(2022, 10, 17), "в курілці", "LovePHP", usersArr, Igor, new DateTime(2022, 10, 17, 9, 20, 0), new DateTime(2022, 10, 17, 14, 20, 0));
+            BithdayDate bithdayInSashka = new BithdayDate(new DateTime(2023, 6, 21), "днюха у сашки купити кільце з хелоу кіті", "Bithday", usersArr, Igor, new DateTime(2023, 6, 25), Sashka);
+
+            List<Action> actions = new List<Action> { meetWithSashka, bithdayInSashka };
 
             Console.WriteLine(meetWithSashka + "\n");
             Console.WriteLine(bithdayInSashka + "\n");
 
             Calendar IgorsCalendar = new Calendar(actions);
             Console.WriteLine(IgorsCalendar);
+
+            IgorsCalendar.Clone(1, new DateTime(2024, 6, 21));
+            Console.WriteLine(IgorsCalendar);
+            IgorsCalendar.actionArr[2].userArr.Add(Igor);
+            Console.WriteLine(IgorsCalendar.actionArr[2].userArr[2]);
+
+            Console.WriteLine(IgorsCalendar.actionArr[1].userArr[2]);
+
         }
     }
 
     public interface IPrototype{
+      
         IPrototype Clone();
+
     }
 
     class User : IPrototype
@@ -60,17 +73,17 @@ namespace ArhitectureLab2
         }
     }
 
-    class Calendar : IPrototype
+    class Calendar
     {
-        public Action[] actionArr;
-        public Calendar(Action[] actionArr)
+        public List<Action> actionArr;
+        public Calendar(List<Action> actionArr)
         {
             this.actionArr = actionArr;
         }
 
         public void addAction(Action value)
         {
-            actionArr.Append(value);
+            actionArr.Add(value);
         }
         public override string ToString()
         {
@@ -82,39 +95,46 @@ namespace ArhitectureLab2
             return str;
         }
 
-        public IPrototype Clone()
+        public Calendar Clone(int i, DateTime newDate)
         {
-            return new Calendar(actionArr);
+            actionArr.Add(actionArr[i].Clone() as Action);
+
+            actionArr[actionArr.Count-1].date = newDate;
+            return this;
         }
     }
+
+
     class Action : IPrototype
     {
         public DateTime date;
         public string description;
         public User user;
+        public List<User> userArr;
         private string _secretKey;
         public string SecretKey { get { return _secretKey; } set { _secretKey = value; } }
-        public Action(DateTime date, string description, string secretKey, User user)
+        public Action(DateTime date, string description, string secretKey, List<User> userArr, User user)
         {
             this.date = date;
             this.description = description;
             this._secretKey = secretKey;
+            this.userArr = userArr;
             this.user = user;
         }
         public override string ToString()
         {
             return date + ", " + description + ", " + user;
         }
-        public IPrototype Clone()
+        public virtual IPrototype Clone()
         {
-            return new Action(date, description, SecretKey, user);
+            return new Action(date, description, SecretKey, new List<User>(userArr), user);
         }
     }
 
     class Meeting: Action
     {
         public DateTime startDate, finishDate;
-        public Meeting(DateTime date, string description, string secretKey, User user, DateTime startDate, DateTime finishDate) : base(date, description, secretKey,user)
+        public Meeting(DateTime date, string description, string secretKey, List<User> userArr, User user, DateTime startDate, DateTime finishDate) : base(date, description, secretKey, userArr,user)
         {
             this.startDate = startDate;
             this.finishDate = finishDate;
@@ -123,9 +143,9 @@ namespace ArhitectureLab2
         {
             return date + ", " + description + ", " + user + ", " + startDate + ", " + finishDate;
         }
-        public IPrototype Clone()
+        public override IPrototype Clone()
         {
-            return new Meeting(date, description, SecretKey, user, startDate, finishDate);
+            return new Meeting(date, description, SecretKey, new List<User>(userArr), user, startDate, finishDate);
         }
     }
 
@@ -133,7 +153,7 @@ namespace ArhitectureLab2
     {
         public DateTime bithdayDate;
         public User bithdayMan;
-        public BithdayDate(DateTime date, string description, string secretKey, User user, DateTime bithdayDate, User bithdayMan) : base(date, description, secretKey, user)
+        public BithdayDate(DateTime date, string description, string secretKey, List<User> userArr, User user, DateTime bithdayDate, User bithdayMan) : base(date, description, secretKey, userArr, user)
         {
             this.bithdayDate = bithdayDate;
             this.bithdayMan = bithdayMan;
@@ -143,9 +163,9 @@ namespace ArhitectureLab2
             return date + ", " + description + ", " + user + ", " + bithdayDate + ", " + bithdayMan;
         }
 
-        public IPrototype Clone()
+        public override IPrototype Clone()
         {
-            return new BithdayDate(date, description, SecretKey, user,bithdayDate,bithdayMan);
+            return new BithdayDate(date, description, SecretKey, new List<User>(userArr), user, bithdayDate, bithdayMan);
         }
     }
 }
