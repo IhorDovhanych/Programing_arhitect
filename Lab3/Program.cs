@@ -23,19 +23,21 @@ namespace ConsoleApp2
         static void Main(string[] args)
         {
             Login log1 = new Login(DateTime.Now, "Andrashko");
+            RealSubject sub = new RealSubject(DateTime.Now, "Putin Died");
 
-            log1.addRequest(DateTime.Now, "Andrashko")
-                .addRequest(DateTime.Now, "Pivo")
-                .addRequest(DateTime.Now, "Putin Died")
-                .addRequest(DateTime.Now, "Andrashko")
-                .addRequest(DateTime.Now, "Pivo")
-                .addRequest(DateTime.Now, "Pivo")
-                .addRequest(DateTime.Now, "Putin Died")
-                .addRequest(DateTime.Now, "Pivo")
-                .addRequest(DateTime.Now, "P#hub")
-                .addRequest(DateTime.Now, "Putin Died")
-                .addRequest(DateTime.Now, "Putin Died")
-                .addRequest(DateTime.Now, "Putin Died");
+
+            log1.Request(DateTime.Now, "Andrashko");
+            log1.Request(DateTime.Now, "Pivo");
+            log1.Request(sub);
+            log1.Request(DateTime.Now, "Andrashko");
+            log1.Request(DateTime.Now, "Pivo");
+            log1.Request(DateTime.Now, "Pivo");
+            log1.Request(DateTime.Now, "Putin Died");
+            log1.Request(DateTime.Now, "Pivo");
+            log1.Request(DateTime.Now, "P#hub");
+            log1.Request(sub);
+            log1.Request(sub);
+            log1.Request(sub);
 
             Console.WriteLine(log1.ShowTopRequests(3));
 
@@ -46,10 +48,26 @@ namespace ConsoleApp2
 
     interface ISubject
     {
-        string ShowTopRequests(int n);
-        string[] Request(DateTime date, string request);
+        string Request(DateTime date, string request);
+        string Request();
     }
-    
+    class RealSubject : ISubject
+    {
+        public DateTime date;
+        public string req;
+        public RealSubject(DateTime date, string request = "")
+        {
+            this.date = date;
+            this.req = request;
+        }
+        public string Request(DateTime date , string request = "")
+        {
+            return $"Date: {date}, Req: {request}, result = //Google //Facebook";
+        }
+        public string Request() {
+            return $"Date: {this.date}, Req: {this.req}, result = //Google //Facebook";
+        }
+    }
     class Login: ISubject
     {
         private List<string[]> requestArr = new List<string[]>();
@@ -58,20 +76,28 @@ namespace ConsoleApp2
             
             this.requestArr.Add(new string[] { date.ToString(), request });
         }
+        public Login(RealSubject sub)
+        {
+            this.requestArr.Add(new string[] { sub.date.ToString(), sub.req });
+        }
 
-        public Login addRequest(DateTime date, string request = "")
+
+        public string Request(DateTime date, string request = "")
         {
             this.requestArr.Add(new string[] { $"{date}", request });
-            return this;
+            return $"Date: {date}, Req: {request}, result = //Google //Facebook";
         }
-
-
-        public string[] Request(DateTime date, string request = "")
+        public string Request()
         {
-            this.requestArr.Add(new string[] { $"{date}", request });      
-            return new string[] { "//Google", "//Facebook" };
+            return $"Date: {this.requestArr[this.requestArr.Count-1][0]}," +
+                $" Req: {this.requestArr[this.requestArr.Count - 1][1]}, result = //Google //Facebook";
         }
-
+        public string Request(RealSubject sub)
+        {
+            this.requestArr.Add(new string[] { sub.date.ToString(), sub.req });
+            return $"Date: {sub.date}," +
+                $" Req: {sub.req}, result = //Google //Facebook";
+        }
         public string ShowTopRequests(int n)
         {
 
