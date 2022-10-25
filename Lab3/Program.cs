@@ -22,7 +22,7 @@ namespace ConsoleApp2
     {
         static void Main(string[] args)
         {
-            Login log1 = new Login(DateTime.Now, "Andrashko");
+            Proxy log1 = new Proxy(DateTime.Now, "Andrashko");
             RealSubject sub = new RealSubject(DateTime.Now, "Putin Died");
 
 
@@ -68,15 +68,15 @@ namespace ConsoleApp2
             return $"Date: {this.date}, Req: {this.req}, result = //Google //Facebook";
         }
     }
-    class Login: ISubject
+    class Proxy: ISubject
     {
         private List<string[]> requestArr = new List<string[]>();
-        public Login(DateTime date, string request = "")
+        public Proxy(DateTime date, string request = "")
         {
             
             this.requestArr.Add(new string[] { date.ToString(), request });
         }
-        public Login(RealSubject sub)
+        public Proxy(RealSubject sub)
         {
             this.requestArr.Add(new string[] { sub.date.ToString(), sub.req });
         }
